@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>المطورين (API) - WhatsApp Link</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/common.css" />
+  <link rel="stylesheet" href="/css/dashboard.css" />
+  <style>
+    .api-card {
+      background: rgba(0,0,0,0.3);
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      text-align: right;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .key-display {
+      background: #000;
+      color: var(--primary);
+      padding: 10px;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 14px;
+      margin-top: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      word-break: break-all;
+    }
+    .copy-btn {
+      background: var(--primary);
+      color: #000;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+    pre {
+      background: #1e293b;
+      color: #f8fafc;
+      padding: 15px;
+      border-radius: 8px;
+      overflow-x: auto;
+      text-align: left;
+      font-size: 13px;
+      direction: ltr;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container" style="max-width: 600px;">
+    <div class="header">
+      <h1>إعدادات المطورين</h1>
+      <p>استخدم الـ API لإرسال الرسائل من أنظمتك الخاصة</p>
+    </div>
+
+    <div class="api-card">
+      <h3 style="color: white; margin-bottom: 10px;">بيانات الاعتماد</h3>
+      <label style="color: var(--text-muted); font-size: 13px;">مفتاح الـ API (API Key)</label>
+      <div class="key-display">
+        <span id="apiKeyDisplay">جاري التحميل...</span>
+        <button class="copy-btn" onclick="copyText('apiKeyDisplay')">نسخ</button>
+      </div>
+
+      <label style="color: var(--text-muted); font-size: 13px; margin-top: 15px; display: block;">معرف المستخدم (User ID)</label>
+      <div class="key-display">
+        <span id="userIdDisplay">جاري التحميل...</span>
+        <button class="copy-btn" onclick="copyText('userIdDisplay')">نسخ</button>
+      </div>
+    </div>
+
+    <div class="api-card">
+      <h3 style="color: white; margin-bottom: 10px;">مثال على الإرسال (JavaScript)</h3>
+      <pre id="codeSnippet">
+// سيتم توليد الكود هنا
+      </pre>
+      <button class="btn" style="margin-top: 10px;" onclick="copyText('codeSnippet')">نسخ الكود بالكامل</button>
+    </div>
+
+    <div class="nav-links">
+      <a href="/">العودة للوحة التحكم</a>
+      <a href="/subscriptions.html">الاشتراكات</a>
+      <a href="#" onclick="logout()">تسجيل الخروج</a>
+    </div>
+  </div>
+
+  <script src="/js/auth.js"></script>
+  <script>
+    checkAuth();
+    const user = getUser();
+    
+    if (user) {
+      document.getElementById("apiKeyDisplay").innerText = user.api_key;
+      document.getElementById("userIdDisplay").innerText = user.id;
+
+      const baseUrl = window.location.origin;
+      const snippet = `
+fetch("${baseUrl}/api/external/send", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "x-api-key": "${user.api_key}"
+  },
+  body: JSON.stringify({
+    number: "201000000000",
+    message: "رسالة تجريبية من الـ API"
+  })
+})
+.then(res => res.json())
+.then(data => console.log(data));
+      `.trim();
+      
+      document.getElementById("codeSnippet").innerText = snippet;
+    }
+
+    function copyText(id) {
+      const text = document.getElementById(id).innerText;
+      navigator.clipboard.writeText(text);
+      alert("تم النسخ!");
+    }
+  </script>
+</body>
+</html>

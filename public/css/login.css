@@ -1,0 +1,19 @@
+/* OTP Input specific styling */
+#otpInput {
+  text-align: center;
+  letter-spacing: 12px;
+  font-size: 20px; /* Reduced from 24px as requested */
+  padding: 12px; /* Reduced padding */
+  font-weight: 700;
+  max-width: 250px;
+  margin: 0 auto;
+  display: block;
+}
+
+.login-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 160px);
+  padding: 20px;
+}

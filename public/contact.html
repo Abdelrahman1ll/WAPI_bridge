@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تواصل معنا - WAPI Bridge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/common.css">
+    <style>
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 50px;
+        }
+        .contact-info {
+            padding: 40px;
+        }
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .info-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: rgba(37, 211, 102, 0.1);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        .contact-form-container {
+            padding: 40px;
+        }
+        @media (max-width: 768px) {
+            .contact-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container flex" style="justify-content: space-between; align-items: center; width: 100%;">
+            <a href="/" class="logo">WAPI Bridge</a>
+            
+            <!-- Desktop Nav -->
+            <nav id="desktopNav" class="desktop-only" style="display: flex; align-items: center; gap: 30px;">
+                <a href="/">الرئيسية</a>
+                <a href="/#features">المميزات</a>
+                <a href="/#pricing">الأسعار</a>
+                <a href="/contact" style="color: var(--primary);">تواصل معنا</a>
+            </nav>
+
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <!-- Desktop Login Btn -->
+                <button id="loginBtn" class="btn-primary desktop-only" onclick="window.location.href='/'">دخول</button>
+
+                <!-- Unified Mobile/User Menu -->
+                <div id="userMenu" style="position: relative;">
+                    <!-- Avatar (Logged In) -->
+                    <div id="userAvatar" onclick="toggleDropdown()" style="display: none; width: 45px; height: 45px; border-radius: 50%; background: var(--primary); color: #0b141a; align-items: center; justify-content: center; font-weight: 800; font-size: 20px; cursor: pointer; box-shadow: 0 0 15px var(--primary-glow); transition: all 0.3s; position: relative;">
+                        U
+                        <div id="onlineDot" style="position: absolute; bottom: 2px; right: 2px; width: 12px; height: 12px; border-radius: 50%; background: #4ade80; border: 2px solid #0b141a; box-shadow: 0 0 10px #4ade80;"></div>
+                    </div>
+
+                    <!-- Hamburger (Guest Mobile) -->
+                    <button id="mobileMenuBtn" class="mobile-only" onclick="toggleDropdown()" style="background: none; border: none; color: white; cursor: pointer; padding: 5px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                    </button>
+
+                    <div id="userDropdown" class="glass-card" style="display: none; position: absolute; top: 60px; left: 0; width: 220px; padding: 10px; z-index: 1000; text-align: right; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+                        <div class="mobile-only" style="border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; margin-bottom: 10px;">
+                            <a href="/" class="dropdown-item">الرئيسية</a>
+                            <a href="/#features" class="dropdown-item">المميزات</a>
+                            <a href="/#pricing" class="dropdown-item">الأسعار</a>
+                            <a href="/contact" class="dropdown-item" style="color: var(--primary);">تواصل معنا</a>
+                            <div id="mobileLoginItem" style="margin-top: 10px; padding: 0 5px;">
+                                <button class="btn-primary w-full" style="justify-content: center; font-size: 14px;" onclick="window.location.href='/'">دخول</button>
+                            </div>
+                        </div>
+                        <div id="userActions" style="display: none;">
+                            <a href="/admin" id="adminLink" class="dropdown-item" style="display: none; color: #34b7f1; font-weight: 700;">لوحة الإدارة</a>
+                            <a href="/admin-messages" id="adminMsgLink" class="dropdown-item" style="display: none; color: #4ade80;">الرسائل والاشعارات</a>
+                            <a href="/dashboard" class="dropdown-item">لوحة التحكم</a>
+                            <a href="/subscriptions" class="dropdown-item">الاشتراكات</a>
+                            <div style="height: 1px; background: rgba(255,255,255,0.1); margin: 5px 0;"></div>
+                            <a href="#" onclick="logout()" class="dropdown-item" style="color: #ef4444;">تسجيل الخروج</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mt-40">
+        <div class="section-title">
+            <h1>تواصل مع فريق الدعم</h1>
+            <p style="color: var(--text-dim);">نحن هنا لمساعدتك في أي وقت. لا تتردد في طرح استفساراتك.</p>
+        </div>
+
+        <div class="contact-grid">
+            <!-- Left: Contact Info -->
+            <div class="glass-card contact-info">
+                <div class="info-item">
+                    <div class="info-icon">📞</div>
+                    <div>
+                        <h4 style="color: var(--primary);">رقم الهاتف</h4>
+                        <p style="color: var(--text-dim);">+20 101 234 5678</p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon">✉</div>
+                    <div>
+                        <h4 style="color: var(--primary);">البريد الإلكتروني</h4>
+                        <p style="color: var(--text-dim);">support@wapibridge.com</p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon">💬</div>
+                    <div>
+                        <h4 style="color: var(--primary);">دعم الواتساب</h4>
+                        <p style="color: var(--text-dim);">م متاح على مدار الساعة</p>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 50px; padding: 20px; border-radius: 15px; background: rgba(37, 211, 102, 0.05); border: 1px dashed var(--primary);">
+                    <p style="font-size: 14px; color: var(--text-dim);">
+                        <span style="color: var(--primary); font-weight: 700;">💡 ملاحظة:</span>
+                        إذا كنت قد قمت بالدفع بالفعل، يرجى إرسال لقطة شاشة لعملية التحويل عبر الواتساب لتسريع عملية التفعيل.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Right: Contact Form (Placeholder) -->
+            <div class="glass-card contact-form-container">
+                <h3 class="mb-20">أرسل لنا رسالة</h3>
+                <form id="contactForm">
+                    <div class="input-group">
+                        <label>الاسم بالكامل</label>
+                        <input type="text" placeholder="مثلاً: محمد علي" required>
+                    </div>
+                    <div class="input-group">
+                        <label>البريد الإلكتروني</label>
+                        <input type="email" placeholder="example@mail.com" required>
+                    </div>
+                    <div class="input-group">
+                        <label>الموضوع</label>
+                        <input type="text" placeholder="مثلاً: مشكلة في تفعيل الحساب">
+                    </div>
+                    <div class="input-group">
+                        <label>الرسالة</label>
+                        <textarea placeholder="اكتب تفاصيل طلبك هنا..." style="width: 100%; height: 120px; padding: 12px; border-radius: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; resize: none;" required></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary w-full mt-20" style="justify-content: center;">إرسال الرسالة</button>
+                    <div id="formSuccess" class="glass-card" style="display: none; margin-top: 20px; padding: 15px; border-color: var(--primary); color: var(--primary); text-align: center; font-weight: 700;">تم إرسال رسالتك بنجاح!</div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <footer style="margin-top: 100px; padding: 40px 0; border-top: 1px solid rgba(255,255,255,0.1);">
+        <div class="container text-center">
+            <p>© 2026 WAPI Bridge - جميع الحقوق محفوظة</p>
+        </div>
+    </footer>
+
+    <script src="/js/auth.js"></script>
+    <script>
+        // --- New Header Logic ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const isLoggedIn = getCookie("isLoggedIn");
+            const avatar = document.getElementById('userAvatar');
+            const mobileBtn = document.getElementById('mobileMenuBtn');
+            const userActions = document.getElementById('userActions');
+            const mobileLoginItem = document.getElementById('mobileLoginItem');
+            const loginBtn = document.getElementById('loginBtn');
+
+            if (isLoggedIn) {
+                if (loginBtn) loginBtn.style.setProperty('display', 'none', 'important');
+                if (avatar) avatar.style.setProperty('display', 'flex', 'important');
+                if (mobileBtn) mobileBtn.style.setProperty('display', 'none', 'important');
+                if (userActions) userActions.style.setProperty('display', 'block', 'important');
+                if (mobileLoginItem) mobileLoginItem.style.setProperty('display', 'none', 'important');
+
+                // Set first letter of name
+                const user = getUser();
+                if (user.name && avatar) {
+                    avatar.childNodes[0].nodeValue = user.name.charAt(0).toUpperCase();
+                }
+                if (user.role === 'admin') {
+                    const adminLink = document.getElementById('adminLink');
+                    const adminMsgLink = document.getElementById('adminMsgLink');
+                    if (adminLink) adminLink.style.setProperty('display', 'block', 'important');
+                    if (adminMsgLink) adminMsgLink.style.setProperty('display', 'block', 'important');
+                }
+            } else {
+                if (avatar) avatar.style.setProperty('display', 'none', 'important');
+                if (mobileBtn && window.innerWidth <= 768) mobileBtn.style.setProperty('display', 'block', 'important');
+                else if (mobileBtn) mobileBtn.style.setProperty('display', 'none', 'important');
+                if (userActions) userActions.style.setProperty('display', 'none', 'important');
+                if (mobileLoginItem) mobileLoginItem.style.setProperty('display', 'block', 'important');
+            }
+        });
+
+        function toggleDropdown() {
+            const dropdown = document.getElementById('userDropdown');
+            if (dropdown.style.display === 'none' || dropdown.style.display === '') {
+                dropdown.style.display = 'block';
+            } else {
+                dropdown.style.display = 'none';
+            }
+        }
+
+        window.addEventListener('click', (e) => {
+            const userMenu = document.getElementById('userMenu');
+            const dropdown = document.getElementById('userDropdown');
+            const mobileBtn = document.getElementById('mobileMenuBtn');
+            
+            if (userMenu && !userMenu.contains(e.target) && mobileBtn && !mobileBtn.contains(e.target)) {
+                dropdown.style.display = 'none';
+            }
+        });
+
+        document.getElementById('contactForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const btn = form.querySelector('button');
+            const originalText = btn.innerText;
+
+            const data = {
+                name: form.querySelector('input[type="text"]').value,
+                email: form.querySelector('input[type="email"]').value,
+                subject: form.querySelectorAll('input[type="text"]')[1].value,
+                details: form.querySelector('textarea').value
+            };
+
+            try {
+                btn.disabled = true;
+                btn.innerText = 'جاري الإرسال...';
+
+                const res = await fetch('/api/auth/submit-message', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await res.json();
+                if (result.success) {
+                    const successMsg = document.getElementById('formSuccess');
+                    successMsg.style.display = 'block';
+                    form.reset();
+                    setTimeout(() => { successMsg.style.display = 'none'; }, 5000);
+                } else {
+                    alert('خطأ: ' + result.error);
+                }
+            } catch (err) {
+                console.error("Submit message error:", err);
+                alert('حدث خطأ أثناء الإرسال، يرجى المحاولة لاحقاً');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = originalText;
+            }
+        });
+    </script>
+</body>
+</html>

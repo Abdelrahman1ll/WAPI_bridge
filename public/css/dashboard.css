@@ -1,0 +1,175 @@
+/* Dashboard Grid Layout */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  gap: 30px;
+  margin-top: 40px;
+}
+
+@media (max-width: 992px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* QR Section */
+.qr-box {
+  background: white;
+  padding: 20px;
+  border-radius: 20px;
+  width: 260px;
+  height: 260px;
+  margin: 0 auto 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.qr-box img {
+  width: 100%;
+  display: none;
+}
+
+.loader {
+  width: 48px;
+  height: 48px;
+  border: 5px solid #FFF;
+  border-bottom-color: var(--primary);
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Documentation / Code */
+.code-block {
+  background: #010409;
+  border-radius: 12px;
+  padding: 20px;
+  position: relative;
+  margin-top: 15px;
+  direction: ltr;
+}
+
+.code-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  color: var(--text-dim);
+  font-size: 14px;
+}
+
+.copy-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.copy-btn:hover {
+  background: var(--glass);
+  color: white;
+}
+
+pre {
+  overflow-x: auto;
+  color: #d1d7db;
+  font-family: 'Fira Code', 'monospace';
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Simple Syntax Highlighting Simulation */
+.code-block pre {
+  background: #010409;
+  padding: 10px;
+  border-radius: 8px;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.token-keyword { color: #ff7b72; font-weight: bold; }
+.token-string { color: #a5d6ff; }
+.token-function { color: #d2a8ff; }
+.token-comment { color: #8b949e; font-style: italic; }
+.token-operator { color: #ff7b72; }
+.token-number { color: #79c0ff; }
+.token-property { color: #79c0ff; }
+
+/* Status Badges */
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding: 10px 20px;
+  background: var(--glass);
+  border-radius: 100px;
+  width: fit-content;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #f59e0b;
+  box-shadow: 0 0 10px #f59e0b;
+}
+
+.dot.connected {
+  background: var(--primary);
+  box-shadow: 0 0 10px var(--primary);
+}
+
+/* Tab buttons active state */
+.tabs .btn-outline.active {
+  background: var(--gradient);
+  border-color: transparent;
+  color: white;
+}
+
+/* Copyable Input Group */
+.copyable-input-group {
+  display: flex;
+  position: relative;
+  width: 100%;
+}
+
+.copyable-input-group input {
+  padding-right: 50px !important;
+}
+
+.copy-input-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: var(--primary);
+  cursor: pointer;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.3s;
+}
+
+.copy-input-btn:hover {
+  transform: translateY(-50%) scale(1.2);
+  color: white;
+}
+
+.copy-input-btn svg {
+  width: 20px;
+  height: 20px;
+}

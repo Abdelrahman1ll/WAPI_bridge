@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تفاصيل العميل - WAPI Bridge Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/common.css">
+    <style>
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-dim);
+            text-decoration: none;
+            margin-bottom: 30px;
+            transition: color 0.3s;
+        }
+        .back-btn:hover {
+            color: var(--primary);
+        }
+        @media (max-width: 768px) {
+            .payment-header {
+                flex-direction: column !important;
+                text-align: center !important;
+                gap: 15px;
+            }
+            .payment-header > div {
+                text-align: center !important;
+            }
+            .back-btn svg {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container flex" style="justify-content: space-between; align-items: center; width: 100%;">
+            <a href="/" class="logo">WAPI Bridge</a>
+            
+            <!-- Desktop Nav -->
+            <nav id="desktopNav" class="desktop-only" style="display: flex; align-items: center; gap: 30px;">
+                <a href="/">الرئيسية</a>
+                <a href="/admin">العودة للوحة الإدارة</a>
+                <a href="/contact">تواصل معنا</a>
+            </nav>
+
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <!-- Desktop Login Btn -->
+                <button id="loginBtn" class="btn-primary desktop-only" onclick="window.location.href='/'">دخول</button>
+
+                <!-- Unified Mobile/User Menu -->
+                <div id="userMenu" style="position: relative;">
+                    <!-- Avatar (Logged In) -->
+                    <div id="userAvatar" onclick="toggleDropdown()" style="display: none; width: 45px; height: 45px; border-radius: 50%; background: var(--primary); color: #0b141a; align-items: center; justify-content: center; font-weight: 800; font-size: 20px; cursor: pointer; box-shadow: 0 0 15px var(--primary-glow); transition: all 0.3s; position: relative;">
+                        U
+                        <div id="onlineDot" style="position: absolute; bottom: 2px; right: 2px; width: 12px; height: 12px; border-radius: 50%; background: #4ade80; border: 2px solid #0b141a; box-shadow: 0 0 10px #4ade80;"></div>
+                    </div>
+
+                    <!-- Hamburger (Guest Mobile) -->
+                    <button id="mobileMenuBtn" class="mobile-only" onclick="toggleDropdown()" style="background: none; border: none; color: white; cursor: pointer; padding: 5px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                    </button>
+
+                    <div id="userDropdown" class="glass-card" style="display: none; position: absolute; top: 60px; left: 0; width: 220px; padding: 10px; z-index: 1000; text-align: right; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+                        <div class="mobile-only" style="border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; margin-bottom: 10px;">
+                            <a href="/" class="dropdown-item">الرئيسية</a>
+                            <a href="/admin" class="dropdown-item">العودة للوحة الإدارة</a>
+                            <a href="/contact" class="dropdown-item">تواصل معنا</a>
+                            <div id="mobileLoginItem" style="margin-top: 10px; padding: 0 5px;">
+                                <button class="btn-primary w-full" style="justify-content: center; font-size: 14px;" onclick="window.location.href='/'">دخول</button>
+                            </div>
+                        </div>
+                        <div id="userActions" style="display: none;">
+                            <a href="/admin" id="adminLink" class="dropdown-item" style="display: none; color: #34b7f1; font-weight: 700;">لوحة الإدارة</a>
+                            <a href="/admin-messages" id="adminMsgLink" class="dropdown-item" style="color: #4ade80;">الرسائل والاشعارات</a>
+                            <a href="/dashboard" class="dropdown-item">لوحة التحكم</a>
+                            <a href="/subscriptions" class="dropdown-item">الاشتراكات</a>
+                            <div style="height: 1px; background: rgba(255,255,255,0.1); margin: 5px 0;"></div>
+                            <a href="#" onclick="logout()" class="dropdown-item" style="color: #ef4444;">تسجيل الخروج</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mt-40">
+        <a href="/admin" class="back-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            رجوع للوحة الإدارة
+        </a>
+
+        <div class="section-title">
+            <h1 id="clientName">جاري تحميل البيانات...</h1>
+            <p id="clientEmail" style="color: var(--text-dim);"></p>
+        </div>
+
+        <div id="subscriptionContent" style="display: none;">
+            <!-- Current Plan Card -->
+            <div id="currentPlanCard" class="glass-card mb-40" style="padding: 40px; border-left: 5px solid var(--primary);">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 20px;">
+                    <div>
+                        <h2 id="planName" style="font-size: 28px; color: var(--primary);">خطة غير محددة</h2>
+                        <p id="planPrice" style="font-size: 20px; font-weight: 700; margin: 10px 0;">0 ج.م</p>
+                        <p id="planExpiry" style="color: var(--text-dim); font-size: 14px;">تنتهي في: -</p>
+                    </div>
+                    <div style="text-align: left;">
+                        <div style="background: rgba(37, 211, 102, 0.1); padding: 15px 30px; border-radius: 15px; border: 1px solid var(--border);">
+                            <p style="font-size: 14px; color: var(--text-dim);">الرسائل المتبقية</p>
+                            <h3 id="messageBalance" style="font-size: 32px; color: var(--primary); font-weight: 800;">0</h3>
+                            <p style="font-size: 12px; color: var(--text-dim);">من إجمالي <span id="totalMessages">0</span> رسالة</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment History -->
+            <div class="glass-card">
+                <div class="payment-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                    <h2 style="font-size: 20px;">سجل معاملات العميل</h2>
+                    <div style="text-align: left;">
+                        <p style="font-size: 12px; color: var(--text-dim);">إجمالي مدفوعات العميل</p>
+                        <h3 id="totalPaid" style="color: var(--primary); font-size: 24px;">0 ج.م</h3>
+                    </div>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="admin-table" style="margin-top: 0; width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                <th style="padding: 15px; text-align: right;">التاريخ</th>
+                                <th style="padding: 15px; text-align: right;">الباقة</th>
+                                <th style="padding: 15px; text-align: right;">عدد الرسائل</th>
+                                <th style="padding: 15px; text-align: right;">المبلغ</th>
+                                <th style="padding: 15px; text-align: right;">الحالة</th>
+                            </tr>
+                        </thead>
+                        <tbody id="paymentHistoryBody">
+                            <!-- History will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="loadingMsg" style="text-align: center; padding: 100px 0;">
+            <div class="loader" style="margin: 0 auto 30px;"></div>
+            <p>جاري جلب بيانات العميل من السيرفر...</p>
+        </div>
+    </main>
+
+    <script src="/js/auth.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const targetUserId = urlParams.get('id');
+
+        async function loadClientData() {
+            if (!targetUserId) {
+                alert('خطأ: لم يتم تحديد معرف العميل');
+                window.location.href = '/admin';
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/auth/user/${targetUserId}`);
+                const data = await res.json();
+                
+                if (!data.success) {
+                    alert('خطأ: ' + data.error);
+                    window.location.href = '/admin';
+                    return;
+                }
+
+                const user = data.user;
+                document.getElementById('loadingMsg').style.display = 'none';
+                document.getElementById('subscriptionContent').style.display = 'block';
+
+                document.getElementById('clientName').innerText = 'العميل: ' + (user.name || 'مستخدم غير معروف');
+                document.getElementById('clientEmail').innerText = user.email;
+
+                // Display current plan
+                const plans = {
+                    'basic': { name: 'الباقة الأساسية', price: '500 ج.م' },
+                    'pro': { name: 'الباقة الاحترافية', price: '1,500 ج.م' },
+                    'business': { name: 'باقة الشركات', price: '3,500 ج.م' }
+                };
+                
+                const currentPlan = plans[user.subscription_plan] || { name: 'باقة مخصصة', price: '-' };
+                
+                document.getElementById('planName').innerText = currentPlan.name;
+                document.getElementById('planPrice').innerText = currentPlan.price;
+                document.getElementById('planExpiry').innerText = 'تنتهي في: ' + (user.subscription_expires ? new Date(user.subscription_expires).toLocaleDateString('ar-EG') : '-');
+                document.getElementById('messageBalance').innerText = (user.token_limit || 0) - (user.tokens_used || 0);
+                document.getElementById('totalMessages').innerText = user.token_limit || 0;
+
+                // Mock history (Admin view)
+                const history = [];
+                if (user.payment_status === 'approved') {
+                    history.push({ 
+                        date: user.updatedAt || new Date(), 
+                        plan: currentPlan.name, 
+                        messages: user.token_limit || 0, 
+                        amount: parseInt(currentPlan.price.replace(/[^0-9]/g, '')) || 0, 
+                        status: 'approved' 
+                    });
+                }
+
+                const tbody = document.getElementById('paymentHistoryBody');
+                if (history.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 30px; color: var(--text-dim);">لا يوجد سجل معاملات لهذا العميل</td></tr>';
+                } else {
+                    tbody.innerHTML = history.map(item => `
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <td style="padding: 15px;">${new Date(item.date).toLocaleDateString('ar-EG')}</td>
+                            <td style="padding: 15px;">${item.plan}</td>
+                            <td style="padding: 15px;">${item.messages} رسالة</td>
+                            <td style="padding: 15px;">${item.amount} ج.م</td>
+                            <td style="padding: 15px;"><span class="status-badge status-approved">ناجحة</span></td>
+                        </tr>
+                    `).join('');
+                }
+
+                document.getElementById('totalPaid').innerText = history.reduce((sum, item) => sum + item.amount, 0) + ' ج.م';
+
+            } catch (err) {
+                console.error("Load client details error:", err);
+                alert('حدث خطأ أثناء تحميل البيانات');
+            }
+        }
+
+        function logout() {
+            document.cookie = "token=; Path=/; Max-Age=-99999999;";
+            document.cookie = "isLoggedIn=; Path=/; Max-Age=-99999999;";
+            document.cookie = "user=; Path=/; Max-Age=-99999999;";
+            window.location.href = "/";
+        }
+
+        // --- New Header Logic ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const isLoggedIn = getCookie("isLoggedIn");
+            const avatar = document.getElementById('userAvatar');
+            const mobileBtn = document.getElementById('mobileMenuBtn');
+            const userActions = document.getElementById('userActions');
+            const mobileLoginItem = document.getElementById('mobileLoginItem');
+            const loginBtn = document.getElementById('loginBtn');
+
+            if (isLoggedIn) {
+                if (loginBtn) loginBtn.style.setProperty('display', 'none', 'important');
+                if (avatar) avatar.style.setProperty('display', 'flex', 'important');
+                if (mobileBtn) mobileBtn.style.setProperty('display', 'none', 'important');
+                if (userActions) userActions.style.setProperty('display', 'block', 'important');
+                if (mobileLoginItem) mobileLoginItem.style.setProperty('display', 'none', 'important');
+
+                // Set first letter of name
+                const user = getUser();
+                if (user.name && avatar) {
+                    avatar.childNodes[0].nodeValue = user.name.charAt(0).toUpperCase();
+                }
+                if (user.role === 'admin') {
+                    const adminLink = document.getElementById('adminLink');
+                    const adminMsgLink = document.getElementById('adminMsgLink');
+                    if (adminLink) adminLink.style.setProperty('display', 'block', 'important');
+                    if (adminMsgLink) adminMsgLink.style.setProperty('display', 'block', 'important');
+                }
+            } else {
+                if (avatar) avatar.style.setProperty('display', 'none', 'important');
+                if (mobileBtn) mobileBtn.style.setProperty('display', 'block', 'important');
+                if (userActions) userActions.style.setProperty('display', 'none', 'important');
+                if (mobileLoginItem) mobileLoginItem.style.setProperty('display', 'block', 'important');
+            }
+            loadClientData();
+        });
+
+        function toggleDropdown() {
+            const dropdown = document.getElementById('userDropdown');
+            if (dropdown.style.display === 'none' || dropdown.style.display === '') {
+                dropdown.style.display = 'block';
+            } else {
+                dropdown.style.display = 'none';
+            }
+        }
+
+        window.addEventListener('click', (e) => {
+            const userMenu = document.getElementById('userMenu');
+            const dropdown = document.getElementById('userDropdown');
+            const mobileBtn = document.getElementById('mobileMenuBtn');
+            
+            if (userMenu && !userMenu.contains(e.target) && mobileBtn && !mobileBtn.contains(e.target)) {
+                dropdown.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

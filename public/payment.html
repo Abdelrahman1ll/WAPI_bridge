@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إتمام الدفع - WAPI Bridge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/home.css">
+    <style>
+        .payment-container {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 40px;
+            margin-top: 40px;
+        }
+        
+        .summary-card {
+            background: var(--glass);
+            border-radius: 30px;
+            padding: 40px;
+            border: 1px solid var(--border);
+            height: fit-content;
+        }
+
+        .payment-options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .payment-option {
+            border: 2px solid var(--border);
+            border-radius: 24px;
+            padding: 30px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(255, 255, 255, 0.02);
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .payment-option:hover {
+            border-color: var(--primary);
+            background: rgba(37, 211, 102, 0.05);
+            transform: translateY(-5px);
+        }
+
+        .payment-option.active {
+            border-color: var(--primary);
+            background: rgba(37, 211, 102, 0.1);
+            box-shadow: 0 10px 30px rgba(37, 211, 102, 0.1);
+        }
+
+        .payment-option.active::after {
+            content: '✓';
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: var(--primary);
+            color: #0b141a;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .option-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--bg);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+
+        .plan-feature {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            color: var(--text-dim);
+            font-size: 14px;
+        }
+
+        @media (max-width: 992px) {
+            .payment-container { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body style="padding: 60px 0;">
+
+    <div class="container">
+        <header style="background: transparent; border: none; position: relative; margin-bottom: 60px;">
+            <a href="/" class="logo" style="font-size: 32px;">WAPI Bridge</a>
+        </header>
+
+        <div class="section-title" style="text-align: right;">
+            <h2>إتمام عملية الدفع</h2>
+            <p>اختر الوسيلة المناسبة لك لتفعيل اشتراكك فوراً.</p>
+        </div>
+
+        <div class="payment-container">
+            <!-- Order Summary -->
+            <div class="summary-card">
+                <h3 class="mb-20">ملخص الطلب</h3>
+                <div style="padding: 20px; background: rgba(0,0,0,0.2); border-radius: 20px; margin-bottom: 20px;">
+                    <p style="color: var(--text-dim); font-size: 14px;">الخطة المختارة</p>
+                    <h2 id="planName" style="margin: 10px 0;">...</h2>
+                    <h1 id="planPrice" style="color: var(--primary); font-size: 48px;">...<span>جنيه</span></h1>
+                </div>
+                
+                <div id="planFeatures">
+                    <!-- Dynamic features -->
+                </div>
+
+                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--border);">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span>المجموع الفرعي</span>
+                        <span id="subtotal">... جنيه</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span>الضريبة</span>
+                        <span>0 جنيه</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-top: 10px; font-weight: 800; font-size: 20px; color: var(--primary);">
+                        <span>الإجمالي</span>
+                        <span id="total">... جنيه</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Methods -->
+            <div>
+                <h3 class="mb-20">اختر طريقة الدفع</h3>
+                <div class="payment-options-grid">
+                    <!-- InstaPay / Vodafone Cash -->
+                    <div class="payment-option active" onclick="selectOption(this, 'instapay')">
+                        <div class="option-icon">
+                            <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="var(--primary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+                                <line x1="2" y1="10" x2="22" y2="10"></line>
+                                <path d="M16 15h.01"></path>
+                            </svg>
+                        </div>
+                        <h4 style="font-size: 20px; margin-bottom: 5px;">InstaPay / Vodafone Cash</h4>
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                            <p style="font-size: 14px; color: var(--text-dim); margin: 0;">دفع سريع عبر التطبيق أو المحفظة</p>
+                            <button class="btn-primary" onclick="copyPaymentLink(event)" style="width: 110px; height: 38px; padding: 0; font-size: 14px; border-radius: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center;">نسخ</button>
+                        </div>
+                    </div>
+
+                    <!-- Card -->
+                    <div class="payment-option" style="opacity: 0.6; cursor: not-allowed;">
+                        <div class="option-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2" ry="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+                        </div>
+                        <h4 style="font-size: 20px; margin-bottom: 5px;">بطاقة بنكية</h4>
+                        <p style="font-size: 14px; color: var(--text-dim);">قريباً</p>
+                    </div>
+                </div>
+
+                <div class="glass-card mt-20" style="padding: 30px;">
+                    <p style="margin-bottom: 20px; font-size: 14px; color: var(--text-dim);">بالنقر على زر الدفع، فإنك توافق على شروط الخدمة وسياسة الخصوصية الخاصة بنا.</p>
+                    <button class="btn-primary w-full" style="padding: 20px; font-size: 20px; justify-content: center;" onclick="proceedToPayment()">تأكيد ودفع</button>
+                    <a href="/" class="btn-outline w-full mt-20" style="display: block; text-align: center; padding: 15px;">رجوع للرئيسية</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Warning Modal -->
+    <div id="paymentWarning" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; align-items: center; justify-content: center; padding: 20px;">
+        <div class="glass-card" style="max-width: 600px; text-align: center; border: 2px solid var(--primary);">
+            <div style="font-size: 60px; margin-bottom: 20px;">⚠</div>
+            <h2 style="color: var(--primary); margin-bottom: 20px;">تنبيه هام قبل الدفع</h2>
+            <p style="font-size: 18px; line-height: 1.8; margin-bottom: 30px;">
+                يجب أن يكون رقم الهاتف الذي ستقوم بالدفع من خلاله هو نفسه الرقم الذي سجلت به في الموقع:
+                <br>
+                <span id="registeredPhone" style="font-size: 24px; font-weight: 800; color: #fff; display: block; margin: 15px 0;">...</span>
+                إذا قمت بالدفع من رقم مختلف، فلن نتمكن من تفعيل حسابك.
+            </p>
+            <div class="flex gap-10" style="justify-content: center; flex-wrap: wrap;">
+                <button class="btn-primary" onclick="confirmWarning()" style="padding: 15px 30px;">موافق، استمرار للدفع</button>
+                <button class="btn-outline" onclick="closeWarning()" style="padding: 15px 30px;">رجوع لتعديل البيانات</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/auth.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const plan = urlParams.get('plan') || 'Business';
+        const price = urlParams.get('price') || '199';
+
+        const user = getUser();
+        if (user.phone) document.getElementById('registeredPhone').innerText = user.phone;
+
+        const planName = plan === 'Business' ? 'خطة الأعمال' : 'خطة الشركات';
+        document.getElementById('planName').innerText = planName;
+        document.getElementById('planPrice').innerHTML = `${price} <span style="font-size: 16px;">جنيه</span>`;
+        document.getElementById('subtotal').innerText = `${price} جنيه`;
+        document.getElementById('total').innerText = `${price} جنيه`;
+
+        const features = plan === 'Business' 
+            ? ['رسائل غير محدودة', 'دعم الصور والملفات', 'ربط حتى 3 أجهزة', 'أولوية في الدعم']
+            : ['كل مميزات الأعمال', 'ربط غير محدود', 'API مخصص', 'دعم 24/7'];
+
+        const featuresContainer = document.getElementById('planFeatures');
+        features.forEach(f => {
+            const div = document.createElement('div');
+            div.className = 'plan-feature';
+            div.innerHTML = `<span style="color: var(--primary);">✓</span> ${f}`;
+            featuresContainer.appendChild(div);
+        });
+
+        let selectedMethod = 'instapay';
+
+        function selectOption(el, method) {
+            if (method === 'card') return;
+            document.querySelectorAll('.payment-option').forEach(opt => opt.classList.remove('active'));
+            el.classList.add('active');
+            selectedMethod = method;
+        }
+
+        function copyPaymentLink(e) {
+            e.stopPropagation(); // Prevent parent click
+            const link = "https://ipn.eg/S/qkpfg201065217980/instapay/1DfXwF";
+            navigator.clipboard.writeText(link);
+            
+            const btn = e.currentTarget;
+            const originalText = btn.innerText;
+            btn.innerText = "تم النسخ!";
+            btn.style.background = "#0e7f3a"; // Darker, distinct green
+            btn.style.boxShadow = "0 0 25px rgba(37, 211, 102, 0.6)";
+            btn.style.transform = "scale(1.05)";
+            
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.style.background = "";
+                btn.style.boxShadow = "";
+                btn.style.transform = "";
+            }, 2000);
+        }
+
+        function proceedToPayment() {
+            document.getElementById('paymentWarning').style.display = 'flex';
+        }
+
+        function closeWarning() {
+            document.getElementById('paymentWarning').style.display = 'none';
+        }
+
+        function confirmWarning() {
+            if (selectedMethod === 'instapay') {
+                window.location.href = "https://ipn.eg/S/qkpfg201065217980/instapay/1DfXwF";
+            }
+        }
+    </script>
+</body>
+</html>

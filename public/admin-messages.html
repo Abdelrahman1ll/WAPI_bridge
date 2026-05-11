@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الرسائل والاشعارات - WAPI Bridge Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/common.css">
+    <style>
+        .message-card {
+            padding: 25px;
+            margin-bottom: 20px;
+            border-right: 4px solid var(--primary);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .message-card:hover {
+            transform: scale(1.01);
+            background: rgba(37, 211, 102, 0.05);
+        }
+        .message-card.unread {
+            background: rgba(37, 211, 102, 0.08);
+            border-right-width: 8px;
+        }
+        .msg-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 13px;
+            color: var(--text-dim);
+        }
+        .msg-sender {
+            font-weight: 800;
+            color: var(--primary);
+            font-size: 16px;
+        }
+        .msg-subject {
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: white;
+        }
+        .msg-details {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #cbd5e1;
+        }
+        .status-pill {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .pill-unread { background: #25d366; color: #0b141a; }
+        .pill-read { background: rgba(255,255,255,0.1); color: var(--text-dim); }
+
+        .empty-inbox {
+            text-align: center;
+            padding: 100px 0;
+            color: var(--text-dim);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container flex" style="justify-content: space-between; align-items: center; width: 100%;">
+            <a href="/" class="logo">WAPI Bridge</a>
+            
+            <nav id="desktopNav" class="desktop-only" style="display: flex; align-items: center; gap: 30px;">
+                <a href="/">الرئيسية</a>
+                <a href="/admin">إدارة المستخدمين</a>
+                <a href="/admin-messages" style="color: var(--primary);">الرسائل</a>
+            </nav>
+
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div id="userMenu" style="position: relative;">
+                    <div id="userAvatar" onclick="toggleDropdown()" style="display: none; width: 45px; height: 45px; border-radius: 50%; background: var(--primary); color: #0b141a; align-items: center; justify-content: center; font-weight: 800; font-size: 20px; cursor: pointer; box-shadow: 0 0 15px var(--primary-glow); transition: all 0.3s; position: relative;">
+                        A
+                        <div id="onlineDot" style="position: absolute; bottom: 2px; right: 2px; width: 12px; height: 12px; border-radius: 50%; background: #4ade80; border: 2px solid #0b141a; box-shadow: 0 0 10px #4ade80;"></div>
+                    </div>
+
+                    <button id="mobileMenuBtn" class="mobile-only" onclick="toggleDropdown()" style="background: none; border: none; color: white; cursor: pointer; padding: 5px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                    </button>
+
+                    <div id="userDropdown" class="glass-card" style="display: none; position: absolute; top: 60px; left: 0; width: 220px; padding: 10px; z-index: 1000; text-align: right; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+                        <div class="mobile-only" style="border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; margin-bottom: 10px;">
+                            <a href="/admin" class="dropdown-item">إدارة المستخدمين</a>
+                            <a href="/admin-messages" class="dropdown-item" style="color: var(--primary);">الرسائل</a>
+                        </div>
+                        <div id="userActions">
+                            <a href="/dashboard" class="dropdown-item">لوحة التحكم الشخصية</a>
+                            <div style="height: 1px; background: rgba(255,255,255,0.1); margin: 5px 0;"></div>
+                            <a href="#" onclick="logout()" class="dropdown-item" style="color: #ef4444;">تسجيل الخروج</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mt-40">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+            <h1>صندوق الرسائل والطلبات</h1>
+            <button class="btn-outline" onclick="loadMessages()" style="font-size: 13px;">تحديث القائمة</button>
+        </div>
+
+        <div id="messagesList">
+            <!-- Messages will be loaded here -->
+            <div class="empty-inbox">جاري تحميل الرسائل...</div>
+        </div>
+    </main>
+
+    <script src="/js/auth.js"></script>
+    <script>
+        async function loadMessages() {
+            try {
+                const res = await fetch('/api/auth/messages');
+                const data = await res.json();
+                if (data.success) {
+                    renderMessages(data.messages);
+                } else {
+                    alert('خطأ في تحميل الرسائل');
+                }
+            } catch (err) {
+                console.error("Load messages error:", err);
+            }
+        }
+
+        function renderMessages(messages) {
+            const container = document.getElementById('messagesList');
+            if (messages.length === 0) {
+                container.innerHTML = '<div class="empty-inbox">لا يوجد رسائل حالياً في الصندوق.</div>';
+                return;
+            }
+
+            container.innerHTML = messages.map(msg => `
+                <div class="glass-card message-card ${msg.status === 'unread' ? 'unread' : ''}" onclick="markAsRead('${msg.id}')">
+                    <div class="msg-meta">
+                        <span>${new Date(msg.createdAt).toLocaleString('ar-EG')}</span>
+                        <span class="status-pill ${msg.status === 'unread' ? 'pill-unread' : 'pill-read'}">
+                            ${msg.status === 'unread' ? 'جديدة' : 'تمت القراءة'}
+                        </span>
+                    </div>
+                    <div class="msg-sender">${msg.name} <span style="font-weight: 400; color: var(--text-dim); font-size: 13px;">(${msg.email})</span></div>
+                    <div class="msg-subject">الموضوع: ${msg.subject || 'بدون عنوان'}</div>
+                    <div class="msg-details">${msg.details}</div>
+                </div>
+            `).join('');
+        }
+
+        async function markAsRead(id) {
+            try {
+                await fetch('/api/auth/update-message-status', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id, status: 'read' })
+                });
+                loadMessages();
+            } catch (err) {
+                console.error("Mark read error:", err);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = getUser();
+            const isLoggedIn = getCookie("isLoggedIn");
+            const avatar = document.getElementById('userAvatar');
+            const loginBtn = document.getElementById('loginBtn');
+            const mobileBtn = document.getElementById('mobileMenuBtn');
+            const userActions = document.getElementById('userActions');
+
+            if (user.role !== 'admin') {
+                window.location.href = '/';
+                return;
+            }
+
+            if (isLoggedIn) {
+                if (loginBtn) loginBtn.style.setProperty('display', 'none', 'important');
+                if (avatar) {
+                    avatar.style.setProperty('display', 'flex', 'important');
+                    avatar.childNodes[0].nodeValue = user.name ? user.name.charAt(0).toUpperCase() : 'A';
+                }
+                if (mobileBtn) mobileBtn.style.setProperty('display', 'none', 'important');
+                if (userActions) userActions.style.setProperty('display', 'block', 'important');
+            }
+
+            loadMessages();
+        });
+
+        function toggleDropdown() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.style.display = dropdown.style.display === 'none' || dropdown.style.display === '' ? 'block' : 'none';
+        }
+
+        function logout() {
+            document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            document.cookie = "isLoggedIn=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            document.cookie = "user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            window.location.href = "/";
+        }
+    </script>
+</body>
+</html>
