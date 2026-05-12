@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WAPI Bridge - WhatsApp API Integration</title>
+  <meta name="description" content="نظام متعدد المستأجرين لدمج واتساب عبر Baileys وقاعدة بيانات PostgreSQL">
+</head>
+
+<body>
+
+  <h1>WAPI Bridge</h1>
+  <p>نظام متكامل لربط واتساب عبر API، يدعم عدة مستخدمين بشكل مستقل.</p>
+
+  <hr>
+
+  <h2>المميزات</h2>
+  <ul>
+    <li>ربط حساب واتساب عبر QR Code</li>
+    <li>حفظ الجلسات في قاعدة بيانات PostgreSQL</li>
+    <li>إرسال رسائل عبر API خارجي آمن</li>
+    <li>نظام اشتراكات وحدود للرسائل</li>
+    <li>مصادقة عبر JWT و API Key</li>
+    <li>لوحة تحكم لإدارة الحساب</li>
+    <li>دعم متعدد المستخدمين (Multi-tenant)</li>
+  </ul>
+
+  <hr>
+
+  <h2>إرسال رسالة عبر API</h2>
+
+  <p><strong>الطريقة:</strong> POST</p>
+  <p><strong>الرابط:</strong> <code>https://your-domain.com/api/external/send/:userId</code></p>
+
+  <h3>الـ Headers المطلوبة</h3>
+  <pre>
+Authorization: Bearer YOUR_API_TOKEN
+Content-Type: application/json
+  </pre>
+
+  <h3>Body (JSON)</h3>
+  <pre>
+{
+  "phone": "201xxxxxxxxx",
+  "message": "مرحبا من WAPI Bridge!"
+}
+  </pre>
+
+  <h3>مثال بـ Node.js</h3>
+  <pre>
+const axios = require('axios');
+
+const response = await axios.post(
+  'https://your-domain.com/api/external/send/USER_ID',
+  {
+    phone: '201xxxxxxxxx',
+    message: 'Hello from WAPI Bridge!'
+  },
+  {
+    headers: {
+      'Authorization': 'Bearer YOUR_API_TOKEN'
+    }
+  }
+);
+
+console.log(response.data);
+  </pre>
+
+  <h3>مثال بـ Python</h3>
+  <pre>
+import requests
+
+url = "https://your-domain.com/api/external/send/USER_ID"
+headers = {
+    "Authorization": "Bearer YOUR_API_TOKEN",
+    "Content-Type": "application/json"
+}
+payload = {
+    "phone": "201xxxxxxxxx",
+    "message": "Hello from Python!"
+}
+
+response = requests.post(url, json=payload, headers=headers)
+print(response.json())
+  </pre>
+
+  <h3>مثال بـ cURL</h3>
+  <pre>
+curl -X POST https://your-domain.com/api/external/send/USER_ID \
+  -H "Authorization: Bearer YOUR_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"phone": "201xxxxxxxxx", "message": "Hello!"}'
+  </pre>
+
+  <hr>
+
+  <h2>الاستجابة</h2>
+
+  <h3>نجاح</h3>
+  <pre>
+{
+  "success": true,
+  "message": "تم إرسال الرسالة بنجاح",
+  "balance": 99
+}
+  </pre>
+
+  <h3>خطأ - واتساب غير متصل</h3>
+  <pre>
+{
+  "success": false,
+  "error": "الواتساب غير متصل. يرجى ربط الحساب أولاً."
+}
+  </pre>
+
+  <h3>خطأ - تجاوز حد الرسائل</h3>
+  <pre>
+{
+  "success": false,
+  "error": "لقد استنفدت باقة الرسائل الخاصة بك. يرجى تجديد الاشتراك."
+}
+  </pre>
+
+  <hr>
+
+  <h2>باقات الاشتراك</h2>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>الباقة</th>
+        <th>عدد الرسائل</th>
+        <th>المدة</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>المجانية</td>
+        <td>100 رسالة</td>
+        <td>30 يوم</td>
+      </tr>
+      <tr>
+        <td>الأساسية</td>
+        <td>1,000 رسالة</td>
+        <td>30 يوم</td>
+      </tr>
+      <tr>
+        <td>المتقدمة</td>
+        <td>5,000 رسالة</td>
+        <td>30 يوم</td>
+      </tr>
+      <tr>
+        <td>الاحترافية</td>
+        <td>15,000 رسالة</td>
+        <td>30 يوم</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <hr>
+
+  <h2>متطلبات التشغيل</h2>
+  <ul>
+    <li>Node.js v16 أو أحدث</li>
+    <li>PostgreSQL</li>
+    <li>npm</li>
+  </ul>
+
+  <h2>طريقة التثبيت</h2>
+  <ol>
+    <li>
+      استنساخ المشروع:
+      <pre>git clone https://github.com/Abdelrahman1ll/WAPI_bridge.git</pre>
+    </li>
+    <li>
+      تثبيت المكتبات:
+      <pre>npm install</pre>
+    </li>
+    <li>
+      إنشاء ملف <code>.env</code>:
+      <pre>
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=whatsapp
+DB_USER=postgres
+DB_PASSWORD=your_password
+JWT_SECRET=your_jwt_secret
+      </pre>
+    </li>
+    <li>
+      تشغيل المشروع:
+      <pre>npm run dev</pre>
+    </li>
+  </ol>
+
+  <hr>
+
+  <h2>روابط</h2>
+  <ul>
+    <li><a href="https://github.com/Abdelrahman1ll/WAPI_bridge">الكود المصدري على GitHub</a></li>
+    <li><a href="https://github.com/Abdelrahman1ll/WAPI_bridge/issues">الإبلاغ عن مشكلة</a></li>
+  </ul>
+
+  <hr>
+
+  <p>MIT License &copy; 2026 Abdelrahman</p>
+
+</body>
+
+</html>
