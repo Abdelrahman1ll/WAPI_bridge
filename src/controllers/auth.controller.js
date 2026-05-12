@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const { User, Message, Op } = require("../db/pool");
 const { sendOTP } = require("../services/email.service");
+const crypto = require("crypto");
 
 const JWT_SECRET = process.env.JWT_SECRET || "super_secret_jwt_key_12345";
 
@@ -55,8 +56,6 @@ async function requestLogin(req, res) {
     res.status(500).json({ success: false, error: "حدث خطأ داخلي" });
   }
 }
-
-const crypto = require("crypto");
 
 async function verifyOTP(req, res) {
   const { email, otp } = req.body;
@@ -138,7 +137,8 @@ async function verifyOTP(req, res) {
 
 async function getProfile(req, res) {
   try {
-    const user = await User.findByPk(req.user.id);
+    const { Subscription } = require("../db/pool");
+    const user = await User.findByPk(req.user.id, { include: ['subscription'] });
     if (!user) return res.status(404).json({ success: false, error: "المستخدم غير موجود" });
     res.json({ success: true, user });
   } catch (err) {
@@ -190,7 +190,7 @@ async function getAllUsers(req, res) {
 }
 
 async function approvePayment(req, res) {
-  const { userId, tokenLimit, days } = req.body;
+  const { userId, tokenLimit, days, subscriptionId } = req.body;
   const adminId = req.user?.id;
 
   try {
@@ -208,7 +208,8 @@ async function approvePayment(req, res) {
     await user.update({ 
       payment_status: 'approved',
       token_limit: parseInt(tokenLimit) || 1000,
-      subscription_expires: expiryDate
+      subscription_expires: expiryDate,
+      subscription_id: subscriptionId || 2 // Default to Basic plan (ID 2) if not specified
     });
 
     res.json({ success: true, message: "تم تفعيل الحساب وتحديد الصلاحيات بنجاح" });

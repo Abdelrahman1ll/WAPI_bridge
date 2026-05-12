@@ -3,6 +3,7 @@ const {
   DisconnectReason,
   makeCacheableSignalKeyStore,
   fetchLatestBaileysVersion,
+  Browsers
 } = require("@whiskeysockets/baileys");
 const { usePostgresAuthState } = require("../utils/usePostgresAuthState");
 const pino = require("pino");
@@ -28,6 +29,10 @@ async function connectWhatsApp(userId, io) {
     },
     printQRInTerminal: false,
     logger: pino({ level: "silent" }),
+    browser: Browsers.macOS("Desktop"),
+    getMessage: async (key) => {
+      return { conversation: "" };
+    }
   });
 
   sessions.set(userId, sock);
@@ -48,10 +53,15 @@ async function connectWhatsApp(userId, io) {
 
     if (connection === "close") {
       const shouldReconnect =
-        lastDisconnect.error?.output?.statusCode !== DisconnectReason.loggedOut;
+        lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut;
       if (shouldReconnect) {
+        sessions.delete(userId); // Remove dead socket to create a new one
         connectWhatsApp(userId, io);
       } else {
+        // Clear session from database
+        const { WhatsAppSession } = require("../db/pool");
+        WhatsAppSession.destroy({ where: { session_name: `session_${userId}` } }).catch(err => console.error(err));
+
         sessions.delete(userId);
         qrCodes.delete(userId);
         io.to(`user_${userId}`).emit("disconnected", "Logged out");

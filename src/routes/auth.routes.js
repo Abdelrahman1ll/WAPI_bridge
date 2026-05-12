@@ -1,6 +1,19 @@
 const express = require("express");
 const router = express.Router();
-const { requestLogin, verifyOTP, requestLogout, submitPayment, approvePayment, getAllUsers, deactivateUser, getProfile, getUserById, submitMessage, getAllMessages, updateMessageStatus } = require("../controllers/auth.controller");
+const {
+  requestLogin,
+  verifyOTP,
+  requestLogout,
+  submitPayment,
+  approvePayment,
+  getAllUsers,
+  deactivateUser,
+  getProfile,
+  getUserById,
+  submitMessage,
+  getAllMessages,
+  updateMessageStatus,
+} = require("../controllers/auth.controller");
 const { verifyToken } = require("../middlewares/auth.middleware");
 
 router.post("/login", requestLogin);

@@ -26,10 +26,20 @@ async function sendMessage(req, res) {
     return res.status(400).json({ success: false, error: "الواتساب غير متصل. يرجى ربط الحساب أولاً." });
   }
 
+  // Check token limits
+  if (user.tokens_used >= user.token_limit) {
+    return res.status(403).json({ success: false, error: "لقد استنفدت باقة الرسائل الخاصة بك. يرجى تجديد الاشتراك." });
+  }
+
   try {
     const jid = `${number}@s.whatsapp.net`;
     await sock.sendMessage(jid, { text: message });
-    res.json({ success: true, message: "تم إرسال الرسالة بنجاح" });
+    
+    // Decrement balance by incrementing tokens_used
+    user.tokens_used += 1;
+    await user.save();
+
+    res.json({ success: true, message: "تم إرسال الرسالة بنجاح", balance: user.token_limit - user.tokens_used });
   } catch (err) {
     console.error("Send message error:", err);
     res.status(500).json({ success: false, error: "فشل إرسال الرسالة" });

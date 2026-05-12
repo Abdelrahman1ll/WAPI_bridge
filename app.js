@@ -130,6 +130,19 @@ async function startServer() {
   try {
     await sequelize.sync({ alter: true });
     console.log("Database & tables synced using Sequelize (altered)");
+
+    // Seed Default Subscriptions
+    const { Subscription } = require("./src/db/pool");
+    const count = await Subscription.count();
+    if (count === 0) {
+      await Subscription.bulkCreate([
+        { name: "الباقة المجانية", message_limit: 100, price: 0, duration_days: 30 },
+        { name: "الباقة الأساسية", message_limit: 1000, price: 10, duration_days: 30 },
+        { name: "الباقة المتقدمة", message_limit: 5000, price: 25, duration_days: 30 },
+        { name: "الباقة الاحترافية", message_limit: 15000, price: 50, duration_days: 30 }
+      ]);
+      console.log("Default subscriptions created");
+    }
     
     server.listen(3000, () => {
       console.log("Server Running on port 3000");

@@ -126,4 +126,36 @@ const Message = sequelize.define('Message', {
   timestamps: true
 });
 
-module.exports = { sequelize, User, WhatsAppSession, Message, Op };
+// Define Subscription Model
+const Subscription = sequelize.define('Subscription', {
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    primaryKey: true
+  },
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  message_limit: {
+    type: DataTypes.INTEGER,
+    allowNull: false
+  },
+  price: {
+    type: DataTypes.DECIMAL(10, 2),
+    allowNull: false
+  },
+  duration_days: {
+    type: DataTypes.INTEGER,
+    allowNull: false
+  }
+}, {
+  tableName: 'subscriptions',
+  timestamps: false
+});
+
+// Update User Model with foreign key
+User.belongsTo(Subscription, { foreignKey: 'subscription_id', as: 'subscription' });
+Subscription.hasMany(User, { foreignKey: 'subscription_id' });
+
+module.exports = { sequelize, User, WhatsAppSession, Message, Subscription, Op };
